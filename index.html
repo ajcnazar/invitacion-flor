@@ -1,306 +1,176 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#17091f">
-    <meta name="description" content="Flor Gonzales te invita a celebrar sus quince años en una noche llena de música, color y tradición del Carnaval de Barranquilla.">
-    <title>Flor Gonzales | Mis Quince</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <script src="main.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123b2b">
+  <title>Mis XV años · Angella</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="is-locked">
+<body>
 
-    <audio id="carnivalMusic" loop preload="auto">
-        <source src="assets/audio/carnaval.mp3" type="audio/mpeg">
-        Tu navegador no admite la reproducción de audio.
-    </audio>
+  <!-- Sprite SVG: mariposa verde salvia con bordes dorados (se reutiliza con <use>) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="wingGreen" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#dcebc6"/>
+        <stop offset=".55" stop-color="#93c186"/>
+        <stop offset="1" stop-color="#4f8a5c"/>
+      </linearGradient>
+      <g id="wingHalf">
+        <path d="M50 38C40 6 10 0 6 20C3 34 26 44 50 41Z" fill="url(#wingGreen)" stroke="#c6a15b" stroke-width="1.6"/>
+        <path d="M50 43C32 44 16 56 22 70C30 80 46 62 50 47Z" fill="url(#wingGreen)" stroke="#c6a15b" stroke-width="1.6"/>
+        <path d="M50 40C38 28 24 20 14 20M50 44C38 52 30 60 26 68" fill="none" stroke="#f0d99a" stroke-width=".9" opacity=".9"/>
+        <circle cx="20" cy="26" r="2.6" fill="#f0d99a"/>
+        <circle cx="28" cy="62" r="2" fill="#f0d99a"/>
+      </g>
+      <symbol id="butterfly" viewBox="0 0 100 80">
+        <use href="#wingHalf"/>
+        <use href="#wingHalf" transform="translate(100 0) scale(-1 1)"/>
+        <ellipse cx="50" cy="43" rx="2.3" ry="14" fill="#8a6a2b"/>
+        <path d="M49 30C46 22 42 18 38 17M51 30C54 22 58 18 62 17" fill="none" stroke="#8a6a2b" stroke-width="1.2" stroke-linecap="round"/>
+      </symbol>
+    </defs>
+  </svg>
 
-    <canvas id="confettiCanvas" aria-hidden="true"></canvas>
-
-    <button class="music-toggle" id="musicToggle"
-        type="button" aria-label="Reproducir música" hidden>
-        <span class="music-icon" aria-hidden="true">♫</span>
-        <span id="musicLabel">Reproducir música</span>
-    </button>
-
-    <!-- Welcome screen -->
-    <section class="intro-screen" id="introScreen">
-        <div class="intro-glow"></div>
-        <span class="intro-decoration intro-decoration--left" aria-hidden="true">✦</span>
-        <span class="intro-decoration intro-decoration--right" aria-hidden="true">✧</span>
-
-        <div class="intro-content">
-            <p class="eyebrow intro-eyebrow">BARRANQUILLA · LA ARENOSA</p>
-
-            <div class="carnival-emblem" aria-hidden="true">
-                <span class="emblem-star">✦</span>
-                <span class="emblem-number">XV</span>
-                <span class="emblem-caption">FLOR GONZALES</span>
-            </div>
-
-            <p class="intro-kicker">El Caribe se viste de fiesta</p>
-
-            <h1>¡Llegó la hora<br>de celebrar!</h1>
-
-            <p class="intro-description">
-                La música, el color y la alegría del Carnaval
-                se unen para celebrar mis quince años.
-            </p>
-
-            <button class="enter-button" id="enterButton" type="button">
-                <span>Entrar a la fiesta</span>
-                <span class="enter-arrow" aria-hidden="true">→</span>
-            </button>
-
-            <p class="intro-footnote">PREPARA TU CORAZÓN PARA BAILAR</p>
+  <!-- ============ CARTA DE ENTRADA (clic en el sello para abrir) ============ -->
+  <div class="letter-intro" id="intro">
+    <div class="intro-dust" id="introDust" aria-hidden="true"></div>
+    <div class="intro-stage">
+      <p class="intro-top">Tienes una invitación</p>
+      <div class="envelope" id="envelope">
+        <div class="env-back"></div>
+        <div class="env-letter">
+          <small>Con la bendición de Dios</small>
+          <span>Mis</span>
+          <b>XV Años</b>
+          <i>Angella</i>
+          <em>♡</em>
         </div>
+        <div class="env-pocket env-left"></div>
+        <div class="env-pocket env-right"></div>
+        <div class="env-pocket env-bottom"></div>
+        <div class="env-flap"></div>
+        <button class="seal" id="seal" aria-label="Abrir la invitación"><span>♡</span></button>
+      </div>
+      <p class="intro-hint">Toca el sello para abrir</p>
+    </div>
+  </div>
 
-        <div class="intro-bottom" aria-hidden="true">
-            <span>✦</span>
-            <span>PURO SABOR BARRANQUILLERO</span>
-            <span>✦</span>
+  <!-- Capas globales -->
+  <div class="progress" aria-hidden="true"></div>
+  <div id="petals" aria-hidden="true"></div>
+  <div id="sky" aria-hidden="true"></div>
+  <div id="fx" aria-hidden="true"></div>
+
+  <!-- Princesa caminando: baja por la pantalla mientras haces scroll -->
+  <div class="princess" id="princess" aria-hidden="true">
+    <img src="princesa.png" alt="" width="460" height="752">
+  </div>
+
+  <!-- Música: pon tu archivo MP3 junto a index.html y cambia el nombre en src si hace falta.
+       Si el archivo no existe, se usa la melodía sintetizada de respaldo. -->
+  <audio id="bgMusic" src="/Tiempo De Vals Cut.mp3" loop preload="auto"></audio>
+
+  <button class="music" id="musicBtn" aria-label="Activar música" title="Activar o pausar música">♫</button>
+
+  <main class="page">
+    <div class="botanical b1">❦</div>
+    <div class="botanical b2">❦</div>
+    <div class="botanical b3">❦</div>
+    <div class="botanical b4">❦</div>
+
+    <div class="wrap">
+
+      <!-- ============ PORTADA ============ -->
+      <section class="hero" id="hero">
+        <span class="butterfly bt1" aria-hidden="true"><svg viewBox="0 0 100 80"><use href="#butterfly"/></svg></span>
+        <span class="butterfly bt2" aria-hidden="true"><svg viewBox="0 0 100 80"><use href="#butterfly"/></svg></span>
+        <span class="butterfly bt3" aria-hidden="true"><svg viewBox="0 0 100 80"><use href="#butterfly"/></svg></span>
+        <span class="butterfly bt4" aria-hidden="true"><svg viewBox="0 0 100 80"><use href="#butterfly"/></svg></span>
+
+        <div class="kicker">Una noche de ensueño</div>
+        <div class="crown" aria-hidden="true">♕</div>
+        <p class="intro">Ven y sé parte de esta historia</p>
+        <div class="topline"></div>
+        <h1><span>Mis</span>XV Años</h1>
+        <p class="name">Angella</p>
+        <div class="ornament"><i class="heart">♡</i></div>
+        <p class="subtitle">Con la bendición de Dios y mi familia, te invito a celebrar conmigo este momento tan especial.</p>
+        <div class="date-ribbon">Viernes · 25 de diciembre · 2026</div>
+        <button class="open-btn" id="openInvite">Descubre la magia <span>✧</span></button>
+        <div class="hint">Toca la pantalla para llenarla de magia · Música con el botón ♫</div>
+      </section>
+
+      <!-- ============ BIENVENIDA ============ -->
+      <section class="section" id="welcome">
+        <div class="kicker">Mi cuento comienza</div>
+        <h2>Una noche, mil recuerdos</h2>
+        <p class="copy">Hay momentos que se convierten en recuerdos para toda la vida. Hoy comienza un nuevo capítulo para mí y sería maravilloso compartirlo contigo, rodeada de amor, alegría y pequeños detalles mágicos.</p>
+        <div class="gold-rule">✧ ───── ♡ ───── ✧</div>
+      </section>
+
+      <!-- ============ CUENTA REGRESIVA ============ -->
+      <section class="section" id="count">
+        <div class="kicker">La cuenta regresiva</div>
+        <h2>¿Cuánto falta?</h2>
+        <div class="countdown">
+          <p class="countdown-title">Hasta mi gran noche</p>
+          <div class="countdown-sub">25 de diciembre de 2026 · 8:00 p. m.</div>
+          <div class="clock" role="timer" aria-live="off">
+            <div class="timebox"><strong id="days">--</strong><span>Días</span></div>
+            <div class="timebox"><strong id="hours">--</strong><span>Horas</span></div>
+            <div class="timebox"><strong id="minutes">--</strong><span>Minutos</span></div>
+            <div class="timebox"><strong id="seconds">--</strong><span>Segundos</span></div>
+          </div>
+          <p class="count-message" id="countMessage">Cada segundo nos acerca a una noche mágica ♡</p>
         </div>
-    </section>
+      </section>
 
-    <main id="invitation" class="invitation" aria-hidden="true">
+      <!-- ============ DETALLES ============ -->
+      <section class="section" id="details">
+        <div class="kicker">Guarda la fecha</div>
+        <h2>Te espero para celebrar</h2>
+        <div class="details">
+          <div class="detail">
+            <span class="ico">♧</span><small>Fecha</small>
+            <strong>Viernes</strong><strong class="number">25</strong><strong>Diciembre 2026</strong>
+          </div>
+          <div class="detail">
+            <span class="ico">◷</span><small>Hora</small>
+            <strong class="number">8:00</strong><strong>de la noche</strong><strong>P. M.</strong>
+          </div>
+          <div class="detail full">
+            <span class="ico">⌖</span><small>El lugar</small>
+            <strong>Carrera 7C #67B-93</strong><strong>Conjunto Ventura</strong><strong>Salón de Eventos</strong>
+            <a class="cta" href="https://www.google.com/maps/search/?api=1&query=Carrera+7C+%2367B-93%2C+Conjunto+Ventura%2C+Sal%C3%B3n+de+Eventos" target="_blank" rel="noopener">Ver ubicación en Google Maps ↗</a>
+          </div>
+        </div>
+      </section>
 
-        <!-- Main invitation -->
-        <section class="hero section" id="inicio">
-            <div class="hero-lights" aria-hidden="true"></div>
+      <!-- ============ REGALO Y VESTIMENTA ============ -->
+      <section class="section rain-zone" id="gift">
+        <div class="rain" id="rain" aria-hidden="true"></div>
+        <div class="kicker">Un detalle especial</div>
+        <h2>Mi regalo es</h2>
+        <div class="gift">Lluvia de sobres ♡</div>
+        <div class="gold-rule">✧ ───── ❦ ───── ✧</div>
+        <p class="notice">Una pequeña petición para mi noche soñada: por favor, evita vestir de verde. ¡Quiero que las flores, las mariposas y mi vestido sean los protagonistas de ese color!</p>
+      </section>
 
-            <div class="hero-content">
-                <p class="eyebrow reveal">
-                    UNA NOCHE CON SABOR A CARNAVAL
-                </p>
+      <!-- ============ CONFIRMACIÓN ============ -->
+      <section class="section" id="rsvp">
+        <div class="kicker">Lo más importante es compartir</div>
+        <h2>¿Me acompañas?</h2>
+        <p class="copy">Tu presencia hará esta noche aún más especial. Confirma tu asistencia y prepárate para celebrar conmigo.</p>
+        <a class="cta cta-pulse" href="https://wa.me/573012019283?text=Hola%2C%20confirmo%20mi%20asistencia%20a%20los%20XV%20a%C3%B1os%20de%20Angella." target="_blank" rel="noopener">♡ Confirmar por WhatsApp</a>
+        <p class="notice">301 201 9283</p>
+        <div class="footer">¡No faltes, te esperamos! ♡</div>
+      </section>
 
-                <div class="hero-ornament reveal" aria-hidden="true">
-                    <span>✦</span>
-                    <span class="ornament-line"></span>
-                    <span>✦</span>
-                </div>
+    </div>
+  </main>
 
-                <p class="hero-pretitle reveal">
-                    Con mucha alegría quiero invitarte a
-                </p>
-
-                <h1 class="hero-name reveal">
-                    <span>Los quince de</span>
-                    <span class="name-highlight">Flor</span>
-                    <span class="name-last">Gonzales</span>
-                </h1>
-
-                <p class="hero-subtitle reveal">
-                    Una noche mágica para bailar, sonreír
-                    y crear recuerdos inolvidables.
-                </p>
-
-                <div class="hero-date reveal">
-                    <span class="date-day">07</span>
-                    <span class="date-divider"></span>
-                    <span class="date-details">
-                        <span>NOVIEMBRE</span>
-                        <span>2026 · SÁBADO</span>
-                    </span>
-                </div>
-
-                <a class="scroll-link" href="#mensaje">
-                    DESCUBRE MI INVITACIÓN
-                    <span aria-hidden="true">↓</span>
-                </a>
-            </div>
-
-            <span class="hero-side-label hero-side-label--left" aria-hidden="true">
-                ALEGRÍA · CULTURA · TRADICIÓN
-            </span>
-            <span class="hero-side-label hero-side-label--right" aria-hidden="true">
-                CARNAVAL DE BARRANQUILLA
-            </span>
-        </section>
-
-        <!-- Personal message -->
-        <section class="message-section section" id="mensaje">
-            <div class="section-frame reveal">
-                <span class="corner corner--tl" aria-hidden="true">✦</span>
-                <span class="corner corner--tr" aria-hidden="true">✦</span>
-                <span class="corner corner--bl" aria-hidden="true">✦</span>
-                <span class="corner corner--br" aria-hidden="true">✦</span>
-
-                <p class="eyebrow">UN MOMENTO MUY ESPECIAL</p>
-                <h2>¡Quiero celebrar contigo!</h2>
-
-                <div class="separator" aria-hidden="true">❖</div>
-
-                <p class="message-copy">
-                    Cumplir quince años es comenzar una nueva etapa
-                    llena de sueños, ilusiones y experiencias por vivir.
-                </p>
-
-                <p class="message-copy">
-                    Por eso quiero compartir contigo una noche especial,
-                    llena de música, colores y toda la alegría que
-                    caracteriza al Carnaval de nuestra querida Barranquilla.
-                </p>
-
-                <p class="message-highlight">
-                    Tu presencia hará esta noche aún más inolvidable.
-                </p>
-
-                <div class="signature">
-                    <span>Con cariño,</span>
-                    <strong>Flor Gonzales</strong>
-                </div>
-            </div>
-        </section>
-
-        <!-- Countdown -->
-        <section class="countdown-section section" id="cuenta-regresiva">
-            <p class="eyebrow reveal">EL GRAN DÍA SE ACERCA</p>
-            <h2 class="section-title reveal">Cuenta regresiva</h2>
-
-            <p class="section-description reveal">
-                Cada segundo nos acerca a una noche llena de alegría.
-            </p>
-
-            <div class="countdown reveal" id="countdown" aria-label="Cuenta regresiva">
-                <div class="countdown-card">
-                    <span class="countdown-number" id="days">000</span>
-                    <span class="countdown-label">Días</span>
-                </div>
-
-                <div class="countdown-card">
-                    <span class="countdown-number" id="hours">00</span>
-                    <span class="countdown-label">Horas</span>
-                </div>
-
-                <div class="countdown-card">
-                    <span class="countdown-number" id="minutes">00</span>
-                    <span class="countdown-label">Minutos</span>
-                </div>
-
-                <div class="countdown-card">
-                    <span class="countdown-number" id="seconds">00</span>
-                    <span class="countdown-label">Segundos</span>
-                </div>
-            </div>
-
-            <p class="countdown-message" id="countdownMessage" aria-live="polite"></p>
-        </section>
-
-        <!-- Event details -->
-        <section class="details-section section" id="detalles">
-            <div class="details-heading reveal">
-                <p class="eyebrow">RESERVA ESTA FECHA</p>
-                <h2 class="section-title">Nos vemos en la fiesta</h2>
-                <p class="section-description">
-                    Aquí tienes los detalles para acompañarme
-                    en esta celebración tan importante.
-                </p>
-            </div>
-
-            <div class="details-grid">
-                <article class="detail-card reveal">
-                    <span class="detail-icon" aria-hidden="true">✦</span>
-                    <p class="detail-label">FECHA</p>
-                    <h3>7 de noviembre</h3>
-                    <p>Sábado · 2026</p>
-                </article>
-
-                <article class="detail-card reveal">
-                    <span class="detail-icon" aria-hidden="true">◷</span>
-                    <p class="detail-label">HORA</p>
-                    <h3>8:00 p. m.</h3>
-                    <p>¡Llega listo para celebrar!</p>
-                </article>
-
-                <article class="detail-card reveal">
-                    <span class="detail-icon" aria-hidden="true">⌖</span>
-                    <p class="detail-label">LUGAR</p>
-                    <h3>DonBosco</h3>
-                    <p>Dirección exacta por confirmar</p>
-                </article>
-            </div>
-
-            <a class="outline-button reveal" id="mapsButton"
-                href="https://www.google.com/maps/search/?api=1&query=DonBosco%2C%20Barranquilla%2C%20Colombia"
-                target="_blank" rel="noopener noreferrer">
-                Consultar ubicación
-                <span aria-hidden="true">↗</span>
-            </a>
-        </section>
-
-        <!-- Carnival atmosphere -->
-        <section class="dress-section section" id="ambiente">
-            <div class="dress-content reveal">
-                <p class="eyebrow">QUE SE SIENTA EL CARNAVAL</p>
-
-                <h2>La alegría se lleva por dentro</h2>
-
-                <p>
-                    Prepárate para disfrutar de una noche con cumbia,
-                    tambores y el espíritu alegre de La Arenosa.
-                    Ven con toda tu energía para celebrar conmigo.
-                </p>
-
-                <div class="color-palette" aria-label="Colores inspirados en el Carnaval">
-                    <span class="palette-color palette-color--pink"></span>
-                    <span class="palette-color palette-color--gold"></span>
-                    <span class="palette-color palette-color--turquoise"></span>
-                    <span class="palette-color palette-color--orange"></span>
-                    <span class="palette-color palette-color--purple"></span>
-                </div>
-
-                <p class="dress-note">
-                    Código de vestuario: por confirmar.
-                </p>
-            </div>
-        </section>
-
-        <!-- WhatsApp RSVP -->
-        <section class="rsvp-section section" id="confirmacion">
-            <div class="rsvp-card reveal">
-                <span class="rsvp-star" aria-hidden="true">✦</span>
-                <p class="eyebrow">¡NO PUEDES FALTAR!</p>
-
-                <h2>¿Me acompañas?</h2>
-
-                <p>
-                    Confirma tu asistencia y ven a compartir
-                    conmigo una noche llena de música y felicidad.
-                </p>
-
-                <a class="confirm-button" id="whatsappButton"
-                    href="https://wa.me/?text=Hola%2C%20quiero%20confirmar%20mi%20asistencia%20a%20los%20quince%20de%20Flor%20Gonzales%20el%207%20de%20noviembre%20de%202026%20a%20las%208%3A00%20p.%20m."
-                    target="_blank" rel="noopener noreferrer">
-                    Confirmar por WhatsApp
-                    <span aria-hidden="true">→</span>
-                </a>
-
-                <p class="rsvp-note">
-                    ¡Te espero para celebrar juntos!
-                </p>
-            </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="footer-ornament" aria-hidden="true">✦ ❖ ✦</div>
-
-            <p class="footer-title">Flor Gonzales · Mis quince años</p>
-
-            <p>
-                Una noche de magia, tradición y sabor caribeño.
-            </p>
-
-            <p class="footer-date">07 · 11 · 2026 — 8:00 P. M.</p>
-
-            <p class="footer-city">BARRANQUILLA, COLOMBIA</p>
-        </footer>
-    </main>
+  <script src="main.js"></script>
 </body>
 </html>

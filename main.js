@@ -1,429 +1,426 @@
+(() => {
+  'use strict';
 
-"use strict";
+  /* =====================================================
+     UTILIDADES
+     ===================================================== */
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = id => document.getElementById(id);
+  const rand = (min, max) => min + Math.random() * (max - min);
+  const BUTTERFLY_SVG = '<svg viewBox="0 0 100 80" aria-hidden="true"><use href="#butterfly"/></svg>';
 
-document.addEventListener("DOMContentLoaded", () => {
-    const introScreen = document.getElementById("introScreen");
-    const enterButton = document.getElementById("enterButton");
-    const invitation = document.getElementById("invitation");
+  function make(tag, className, parent) {
+    const el = document.createElement(tag);
+    el.className = className;
+    if (parent) parent.appendChild(el);
+    return el;
+  }
 
-    const music = document.getElementById("carnivalMusic");
-    const musicToggle = document.getElementById("musicToggle");
-    const musicLabel = document.getElementById("musicLabel");
+  /* =====================================================
+     1. APARICIÓN DE SECCIONES (escalonada)
+     ===================================================== */
+  function initReveal() {
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => {
+      [...section.children].forEach((child, i) => child.style.setProperty('--i', i));
+      section.querySelectorAll('.detail').forEach((card, i) => card.style.setProperty('--i', i));
+    });
 
-    const canvas = document.getElementById("confettiCanvas");
-    const context = canvas.getContext("2d");
+    if (!('IntersectionObserver' in window)) {
+      sections.forEach(s => s.classList.add('visible'));
+      return;
+    }
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('visible');
+        document.dispatchEvent(new Event('section-in'));
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.12 });
+    sections.forEach(s => observer.observe(s));
+  }
 
-    const countdownMessage = document.getElementById("countdownMessage");
-    const whatsappButton = document.getElementById("whatsappButton");
-    const mapsButton = document.getElementById("mapsButton");
+  /* =====================================================
+     2. PORTADA: nombre letra por letra + destellos
+     ===================================================== */
+  function initHero() {
+    const name = document.querySelector('.hero .name');
+    const text = name.textContent.trim();
+    name.setAttribute('aria-label', text);
+    name.textContent = '';
+    [...text].forEach((char, i) => {
+      const letter = make('span', 'letter', name);
+      letter.textContent = char;
+      letter.style.setProperty('--i', i);
+      letter.setAttribute('aria-hidden', 'true');
+    });
 
-    const reducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-    ).matches;
+    if (reduce) return;
+    const hero = $('hero');
+    for (let i = 0; i < 16; i++) {
+      const star = make('span', 'twinkle', hero);
+      star.textContent = '✦';
+      star.style.left = rand(3, 95) + '%';
+      star.style.top = rand(3, 95) + '%';
+      star.style.fontSize = rand(.6, 1.3) + 'rem';
+      star.style.animationDelay = rand(0, 3) + 's';
+      star.style.animationDuration = rand(2, 4) + 's';
+    }
+  }
 
-    /*
-     * Event configuration.
-     *
-     * Month indexes start at zero:
-     * 10 = November.
-     *
-     * The countdown ends on November 7, 2026, at 8:00 p.m.
-     * using the visitor's local device time.
-     */
-    const EVENT_DATE = new Date(2026, 10, 7, 20, 0, 0);
-
-    const EVENT_CONFIG = {
-        whatsappPhone: "",
-        venue: "DonBosco",
-        mapsUrl: ""
+  /* =====================================================
+     3. SCROLL: barra de progreso y parallax
+     ===================================================== */
+  function initScroll() {
+    const root = document.documentElement;
+    let ticking = false;
+    const update = () => {
+      const max = root.scrollHeight - window.innerHeight;
+      root.style.setProperty('--sy', window.scrollY);
+      root.style.setProperty('--p', max > 0 ? window.scrollY / max : 0);
+      ticking = false;
     };
+    window.addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    update();
+  }
 
-    let hasEntered = false;
-    let countdownInterval = null;
-    let confettiAnimationFrame = null;
-    let confettiPieces = [];
-    let resizeTimeout = null;
+  /* =====================================================
+     4. MARIPOSAS VOLADORAS (cruzan la pantalla)
+     ===================================================== */
+  function initFlyers() {
+    if (reduce) return;
+    const sky = $('sky');
+    const MAX_FLYERS = 4;
 
-    /* Music controls */
+    function fly() {
+      if (sky.children.length >= MAX_FLYERS) return;
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const dir = Math.random() < .5 ? 1 : -1;
+      const steps = 5;
+      const el = make('span', 'butterfly flyer', sky);
+      el.innerHTML = BUTTERFLY_SVG;
+      el.style.width = rand(28, 50) + 'px';
 
-    function updateMusicButton() {
-        const isPlaying = !music.paused && !music.ended;
+      let x = dir === 1 ? -70 : vw + 70;
+      let y = rand(vh * .1, vh * .85);
+      const points = [[x, y]];
+      for (let i = 1; i <= steps; i++) {
+        x += dir * (vw + 140) / steps;
+        y = Math.min(vh - 40, Math.max(20, y + rand(-vh * .3, vh * .3)));
+        points.push([x, y]);
+      }
 
-        musicToggle.classList.toggle("is-playing", isPlaying);
+      const frames = points.map(([px, py], i) => {
+        const prev = points[Math.max(i - 1, 0)];
+        const next = points[Math.min(i + 1, steps)];
+        const angle = Math.atan2(next[1] - prev[1], next[0] - prev[0]) * 180 / Math.PI + 90;
+        return { transform: `translate(${px}px, ${py}px) rotate(${angle}deg)`, offset: i / steps };
+      });
 
-        musicToggle.setAttribute(
-            "aria-label",
-            isPlaying ? "Pausar música" : "Reproducir música"
-        );
-
-        musicLabel.textContent = isPlaying
-            ? "Pausar música"
-            : "Reproducir música";
+      el.animate(frames, { duration: rand(10000, 16000), easing: 'linear' })
+        .onfinish = () => el.remove();
     }
 
-    async function playMusic() {
+    setTimeout(fly, 700);
+    setInterval(fly, 3200);
+  }
+
+  /* =====================================================
+     5. MAGIA AL TOCAR: destellos y mariposas pequeñas
+     ===================================================== */
+  function initBursts() {
+    if (reduce) return;
+    const fx = $('fx');
+
+    function burst(x, y, count = 9) {
+      for (let i = 0; i < count; i++) {
+        const isButterfly = i % 3 === 0;
+        const el = isButterfly ? make('span', 'mini-butterfly', fx) : make('span', 'spark', fx);
+        if (isButterfly) el.innerHTML = BUTTERFLY_SVG; else el.textContent = '✦';
+
+        const angle = rand(0, Math.PI * 2);
+        const dist = rand(50, isButterfly ? 150 : 110);
+        const dx = Math.cos(angle) * dist, dy = Math.sin(angle) * dist - 30;
+        el.animate([
+          { transform: `translate(${x}px, ${y}px) scale(.3) rotate(0deg)`, opacity: 1 },
+          { transform: `translate(${x + dx}px, ${y + dy}px) scale(1) rotate(${rand(-90, 90)}deg)`, opacity: 0 }
+        ], { duration: rand(900, 1500), easing: 'cubic-bezier(.2,.7,.3,1)' })
+          .onfinish = () => el.remove();
+      }
+    }
+
+    document.addEventListener('pointerdown', e => burst(e.clientX, e.clientY));
+
+    // Estela de destellos solo con mouse
+    let last = 0;
+    document.addEventListener('pointermove', e => {
+      if (e.pointerType !== 'mouse' || e.timeStamp - last < 70) return;
+      last = e.timeStamp;
+      const s = make('span', 'spark', fx);
+      s.textContent = '✦';
+      s.animate([
+        { transform: `translate(${e.clientX}px, ${e.clientY}px) scale(.8)`, opacity: .9 },
+        { transform: `translate(${e.clientX + rand(-14, 14)}px, ${e.clientY + 28}px) scale(.2)`, opacity: 0 }
+      ], { duration: 800, easing: 'ease-out' }).onfinish = () => s.remove();
+    });
+
+    return burst;
+  }
+
+  /* =====================================================
+     6. CUENTA REGRESIVA (25 dic 2026, 8:00 p. m. Colombia, UTC-5)
+     ===================================================== */
+  function initCountdown() {
+    const target = Date.parse('2026-12-26T01:00:00Z');
+    const pad = n => String(n).padStart(2, '0');
+
+    function setValue(id, value) {
+      const el = $(id);
+      if (el.textContent === value) return;
+      el.textContent = value;
+      if (reduce) return;
+      el.classList.remove('flip');
+      void el.offsetWidth;            // reinicia la animación
+      el.classList.add('flip');
+    }
+
+    function tick() {
+      let diff = target - Date.now();
+      if (diff <= 0) {
+        ['days', 'hours', 'minutes', 'seconds'].forEach(id => setValue(id, '00'));
+        $('countMessage').textContent = diff > -86400000
+          ? '¡Hoy es la gran noche de Angella! ♡'
+          : '¡Gracias por celebrar conmigo! ♡';
+        return;
+      }
+      const d = Math.floor(diff / 86400000); diff %= 86400000;
+      const h = Math.floor(diff / 3600000);  diff %= 3600000;
+      const m = Math.floor(diff / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      setValue('days', pad(d));
+      setValue('hours', pad(h));
+      setValue('minutes', pad(m));
+      setValue('seconds', pad(s));
+    }
+
+    tick();
+    setInterval(tick, 1000);
+  }
+
+  /* =====================================================
+     7. PÉTALOS VERDES CAYENDO
+     ===================================================== */
+  function initPetals() {
+    if (reduce) return;
+    const layer = $('petals');
+
+    function petal() {
+      const p = make('span', 'petal', layer);
+      p.style.left = rand(0, 100) + 'vw';
+      p.style.setProperty('--drift', rand(-85, 85) + 'px');
+      p.style.animationDuration = rand(8, 16) + 's';
+      setTimeout(() => p.remove(), 17000);
+    }
+
+    for (let i = 0; i < 12; i++) setTimeout(petal, i * 240);
+    setInterval(petal, 900);
+  }
+
+  /* =====================================================
+     8. LLUVIA DE SOBRES (solo mientras la sección es visible)
+     ===================================================== */
+  function initEnvelopeRain() {
+    const rain = $('rain');
+    if (reduce || !('IntersectionObserver' in window)) return;
+    let timer = null;
+
+    function drop() {
+      const e = make('span', 'envelope', rain);
+      e.textContent = '✉';
+      e.style.left = rand(0, 94) + '%';
+      e.style.fontSize = rand(1, 1.9) + 'rem';
+      e.style.animationDuration = rand(4, 7) + 's';
+      e.style.setProperty('--sway', rand(-40, 40) + 'px');
+      e.addEventListener('animationend', () => e.remove());
+    }
+
+    new IntersectionObserver(([entry]) => {
+      clearInterval(timer);
+      if (entry.isIntersecting) timer = setInterval(drop, 380);
+    }).observe(rain.parentElement);
+  }
+
+  /* =====================================================
+     8b. PRINCESA: camina mientras bajas (la posición la mueve el CSS con --p)
+     ===================================================== */
+  function initPrincess() {
+    const princess = $('princess');
+    if (!princess || reduce) return;
+    let stopTimer;
+    window.addEventListener('scroll', () => {
+      princess.classList.add('walking');
+      clearTimeout(stopTimer);
+      stopTimer = setTimeout(() => princess.classList.remove('walking'), 260);
+    }, { passive: true });
+  }
+
+  /* =====================================================
+     8c. CARTA DE ENTRADA: el clic en el sello abre la invitación
+     ===================================================== */
+  function initIntro(burst) {
+    const intro = $('intro');
+    if (!intro) { document.body.classList.add('opened'); return; }
+    document.body.classList.add('locked');
+
+    if (!reduce) {                                   // polvo dorado de fondo
+      const dust = $('introDust');
+      for (let i = 0; i < 26; i++) {
+        const star = make('span', 'twinkle', dust);
+        star.textContent = '✦';
+        star.style.left = rand(2, 98) + '%';
+        star.style.top = rand(2, 98) + '%';
+        star.style.fontSize = rand(.6, 1.4) + 'rem';
+        star.style.animationDelay = rand(0, 3) + 's';
+        star.style.animationDuration = rand(2, 4.5) + 's';
+      }
+    }
+
+    let opened = false;
+    function open() {
+      if (opened) return;
+      opened = true;
+      const r = $('seal').getBoundingClientRect();
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+
+      intro.classList.add('opening');                // rompe el sello, abre la solapa, sube la carta
+      if (!music.isPlaying()) music.toggle();
+      if (burst) {
+        burst(cx, cy, 28);
+        setTimeout(() => burst(cx, cy - 90, 24), 900);
+        setTimeout(() => burst(cx - 60, cy - 120, 20), 1500);
+      }
+      setTimeout(() => intro.classList.add('leaving'), reduce ? 100 : 2400);
+      setTimeout(() => {
+        intro.remove();
+        document.body.classList.remove('locked');
+        document.body.classList.add('opened');       // arranca la portada y aparece la princesa
+        window.scrollTo(0, 0);
+        if (burst) burst(window.innerWidth / 2, window.innerHeight * .4, 32);
+      }, reduce ? 300 : 3300);
+    }
+    $('seal').addEventListener('click', open);
+    $('envelope').addEventListener('click', open);
+  }
+
+  /* =====================================================
+     9. MÚSICA (melodía instrumental sintetizada)
+     ===================================================== */
+  const music = (() => {
+    const NOTES = [523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880, 698.46,
+                   523.25, 659.25, 783.99, 1046.5, 880, 783.99, 659.25, 587.33];
+    const btn = $('musicBtn');
+    let ctx = null, master = null, timer = null, playing = false, index = 0;
+
+    function playNote(freq, when, dur) {
+      const layers = [
+        { type: 'sine',     mult: 1, peak: .065, length: dur },
+        { type: 'triangle', mult: 2, peak: .009, length: dur * .8 }
+      ];
+      layers.forEach(({ type, mult, peak, length }) => {
+        const osc = ctx.createOscillator(), gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq * mult, when);
+        gain.gain.setValueAtTime(.0001, when);
+        gain.gain.exponentialRampToValueAtTime(peak, when + .06);
+        gain.gain.exponentialRampToValueAtTime(.0001, when + length);
+        osc.connect(gain);
+        gain.connect(master);
+        osc.start(when);
+        osc.stop(when + length + .03);
+      });
+    }
+
+    function loop() {
+      if (!playing || !ctx) return;
+      const now = ctx.currentTime;
+      for (let i = 0; i < 4; i++) playNote(NOTES[(index + i) % NOTES.length], now + i * .42, .65);
+      index = (index + 4) % NOTES.length;
+      timer = setTimeout(loop, 1680);
+    }
+
+    function setUi(on) {
+      btn.textContent = on ? '♫' : '♪';
+      btn.classList.toggle('on', on);
+      btn.setAttribute('aria-label', on ? 'Pausar música' : 'Activar música');
+    }
+
+    async function toggleSynth() {
+      try {
+        if (!ctx) {
+          ctx = new (window.AudioContext || window.webkitAudioContext)();
+          master = ctx.createGain();
+          master.gain.value = .38;
+          master.connect(ctx.destination);
+        }
+        if (!playing) {
+          await ctx.resume();
+          playing = true;
+          setUi(true);
+          loop();
+        } else {
+          playing = false;
+          clearTimeout(timer);
+          await ctx.suspend();
+          setUi(false);
+        }
+      } catch (err) {
+        btn.textContent = '♪';
+      }
+    }
+
+    // --- Tu MP3: edita el nombre del archivo en <audio id="bgMusic" src="..."> del HTML ---
+    const file = $('bgMusic');
+    let fileOk = !!file && !!file.getAttribute('src');
+    if (file) file.addEventListener('error', () => { fileOk = false; });
+
+    async function toggle() {
+      if (fileOk) {
         try {
-            await music.play();
-            updateMusicButton();
-            return true;
-        } catch (error) {
-            updateMusicButton();
-
-            console.warn(
-                "No se pudo reproducir el audio. Comprueba assets/audio/carnaval.mp3.",
-                error
-            );
-
-            return false;
+          if (!playing) { await file.play(); playing = true; setUi(true); }
+          else { file.pause(); playing = false; setUi(false); }
+          return;
+        } catch (err) {
+          fileOk = false;      // archivo ausente o bloqueado: usa la melodía de respaldo
+          playing = false;
         }
+      }
+      return toggleSynth();
     }
 
-    function pauseMusic() {
-        music.pause();
-        updateMusicButton();
-    }
-
-    music.addEventListener("play", updateMusicButton);
-    music.addEventListener("pause", updateMusicButton);
-    music.addEventListener("ended", updateMusicButton);
-
-    music.addEventListener("error", () => {
-        console.error(
-            "Error al cargar la canción. Revisa la ruta y el formato del archivo."
-        );
-        updateMusicButton();
-    });
-
-    musicToggle.addEventListener("click", async () => {
-        if (music.paused) {
-            await playMusic();
-        } else {
-            pauseMusic();
-        }
-    });
-
-    /* Open the invitation */
-
-    enterButton.addEventListener("click", async () => {
-        if (hasEntered) {
-            return;
-        }
-
-        hasEntered = true;
-        enterButton.disabled = true;
-
-        /*
-         * Request audio playback immediately after the user's click.
-         * Browsers may block autoplay when no user interaction occurred.
-         */
-        await playMusic();
-
-        introScreen.classList.add("is-exiting");
-
-        invitation.setAttribute("aria-hidden", "false");
-        invitation.classList.add("is-open");
-
-        musicToggle.hidden = false;
-        document.body.classList.remove("is-locked");
-
-        if (!reducedMotion) {
-            startConfetti();
-        }
-
-        observeRevealElements();
-
-        window.setTimeout(() => {
-            introScreen.hidden = true;
-
-            document.getElementById("mensaje").scrollIntoView({
-                behavior: reducedMotion ? "auto" : "smooth",
-                block: "start"
-            });
-        }, reducedMotion ? 50 : 900);
-    });
-
-    /* Reveal elements when they enter the viewport */
-
-    function observeRevealElements() {
-        const elements = document.querySelectorAll(
-            "#invitation .reveal:not(.is-visible)"
-        );
-
-        if (!("IntersectionObserver" in window)) {
-            elements.forEach((element) => {
-                element.classList.add("is-visible");
-            });
-
-            return;
-        }
-
-        const observer = new IntersectionObserver(
-            (entries, currentObserver) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add("is-visible");
-                        currentObserver.unobserve(entry.target);
-                    }
-                });
-            },
-            {
-                threshold: 0.12,
-                rootMargin: "0px 0px -35px 0px"
-            }
-        );
-
-        elements.forEach((element) => {
-            observer.observe(element);
-        });
-    }
-
-    /* Countdown */
-
-    const countdownElements = {
-        days: document.getElementById("days"),
-        hours: document.getElementById("hours"),
-        minutes: document.getElementById("minutes"),
-        seconds: document.getElementById("seconds")
-    };
-
-    function formatNumber(value, length = 2) {
-        return String(value).padStart(length, "0");
-    }
-
-    function updateCountdown() {
-        const now = new Date();
-        const difference = EVENT_DATE.getTime() - now.getTime();
-
-        if (difference <= 0) {
-            Object.values(countdownElements).forEach((element) => {
-                element.textContent = "00";
-            });
-
-            countdownMessage.textContent =
-                "¡Llegó la hora! Que comience la celebración de Flor.";
-
-            if (countdownInterval !== null) {
-                window.clearInterval(countdownInterval);
-                countdownInterval = null;
-            }
-
-            return;
-        }
-
-        const totalSeconds = Math.floor(difference / 1000);
-
-        const days = Math.floor(totalSeconds / 86400);
-        const hours = Math.floor((totalSeconds % 86400) / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
-
-        countdownElements.days.textContent = formatNumber(days, 3);
-        countdownElements.hours.textContent = formatNumber(hours);
-        countdownElements.minutes.textContent = formatNumber(minutes);
-        countdownElements.seconds.textContent = formatNumber(seconds);
-
-        countdownMessage.textContent =
-            "El gran encuentro será el 7 de noviembre a las 8:00 p. m.";
-    }
-
-    function startCountdown() {
-        updateCountdown();
-
-        if (countdownInterval !== null) {
-            window.clearInterval(countdownInterval);
-        }
-
-        countdownInterval = window.setInterval(updateCountdown, 1000);
-    }
-
-    startCountdown();
-
-    /* Confetti canvas */
-
-    const confettiColors = [
-        "#ff287c",
-        "#ffd36a",
-        "#27ead0",
-        "#ff8b38",
-        "#a66cff",
-        "#fff8f0"
-    ];
-
-    function resizeCanvas() {
-        const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-
-        canvas.width = Math.floor(window.innerWidth * pixelRatio);
-        canvas.height = Math.floor(window.innerHeight * pixelRatio);
-
-        canvas.style.width = `${window.innerWidth}px`;
-        canvas.style.height = `${window.innerHeight}px`;
-
-        context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    }
-
-    function createConfettiPiece(initial = false) {
-        return {
-            x: Math.random() * window.innerWidth,
-            y: initial
-                ? Math.random() * window.innerHeight
-                : -20,
-            size: Math.random() * 5 + 3,
-            speedY: Math.random() * 2.5 + 1.2,
-            speedX: Math.random() * 2 - 1,
-            rotation: Math.random() * Math.PI * 2,
-            rotationSpeed: (Math.random() - 0.5) * 0.12,
-            sway: Math.random() * 1.5,
-            phase: Math.random() * Math.PI * 2,
-            color: confettiColors[
-                Math.floor(Math.random() * confettiColors.length)
-            ],
-            shape: Math.random() > 0.35 ? "rect" : "circle",
-            opacity: Math.random() * 0.45 + 0.55
-        };
-    }
-
-    function drawConfettiPiece(piece) {
-        context.save();
-
-        context.globalAlpha = piece.opacity;
-        context.translate(piece.x, piece.y);
-        context.rotate(piece.rotation);
-        context.fillStyle = piece.color;
-
-        if (piece.shape === "circle") {
-            context.beginPath();
-            context.arc(0, 0, piece.size / 2, 0, Math.PI * 2);
-            context.fill();
-        } else {
-            context.fillRect(
-                -piece.size / 2,
-                -piece.size / 2,
-                piece.size,
-                piece.size * 1.6
-            );
-        }
-
-        context.restore();
-    }
-
-    function animateConfetti() {
-        context.clearRect(
-            0,
-            0,
-            window.innerWidth,
-            window.innerHeight
-        );
-
-        confettiPieces.forEach((piece) => {
-            piece.phase += 0.025;
-            piece.x += piece.speedX + Math.sin(piece.phase) * piece.sway;
-            piece.y += piece.speedY;
-            piece.rotation += piece.rotationSpeed;
-
-            drawConfettiPiece(piece);
-        });
-
-        confettiPieces = confettiPieces.filter(
-            (piece) => piece.y < window.innerHeight + 30
-        );
-
-        if (confettiPieces.length > 0) {
-            confettiAnimationFrame =
-                window.requestAnimationFrame(animateConfetti);
-        } else {
-            context.clearRect(
-                0,
-                0,
-                window.innerWidth,
-                window.innerHeight
-            );
-
-            confettiAnimationFrame = null;
-        }
-    }
-
-    function startConfetti() {
-        if (reducedMotion) {
-            return;
-        }
-
-        if (confettiAnimationFrame !== null) {
-            window.cancelAnimationFrame(confettiAnimationFrame);
-            confettiAnimationFrame = null;
-        }
-
-        resizeCanvas();
-
-        confettiPieces = Array.from(
-            { length: 150 },
-            () => createConfettiPiece(true)
-        );
-
-        animateConfetti();
-    }
-
-    /* Resize handling */
-
-    window.addEventListener("resize", () => {
-        if (resizeTimeout !== null) {
-            window.clearTimeout(resizeTimeout);
-        }
-
-        resizeTimeout = window.setTimeout(() => {
-            resizeCanvas();
-
-            if (confettiPieces.length > 0) {
-                if (confettiAnimationFrame !== null) {
-                    window.cancelAnimationFrame(confettiAnimationFrame);
-                }
-
-                animateConfetti();
-            }
-        }, 150);
-    });
-
-    /* WhatsApp confirmation */
-
-    function configureWhatsApp() {
-        const message =
-            "Hola, quiero confirmar mi asistencia a los quince años " +
-            "de Flor Gonzales el sábado 7 de noviembre de 2026 " +
-            "a las 8:00 p. m. en DonBosco.";
-
-        const encodedMessage = encodeURIComponent(message);
-
-        if (EVENT_CONFIG.whatsappPhone.trim()) {
-            const phone = EVENT_CONFIG.whatsappPhone.replace(/\D/g, "");
-
-            whatsappButton.href =
-                `https://wa.me/${phone}?text=${encodedMessage}`;
-        } else {
-            whatsappButton.href =
-                `https://wa.me/?text=${encodedMessage}`;
-        }
-    }
-
-    /* Venue location */
-
-    function configureMaps() {
-        if (EVENT_CONFIG.mapsUrl.trim()) {
-            mapsButton.href = EVENT_CONFIG.mapsUrl;
-            return;
-        }
-
-        const query = EVENT_CONFIG.venue
-            ? `${EVENT_CONFIG.venue}, Barranquilla, Colombia`
-            : "Barranquilla, Colombia";
-
-        mapsButton.href =
-            "https://www.google.com/maps/search/?api=1&query=" +
-            encodeURIComponent(query);
-    }
-
-    configureWhatsApp();
-    configureMaps();
-
-    /* Initial canvas setup */
-
-    resizeCanvas();
-});
+    btn.addEventListener('click', toggle);
+    return { toggle, isPlaying: () => playing };
+  })();
+
+  /* =====================================================
+     INICIO
+     ===================================================== */
+  initReveal();
+  initHero();
+  initScroll();
+  initFlyers();
+  const burst = initBursts();
+  initCountdown();
+  initPetals();
+  initEnvelopeRain();
+  initPrincess();
+  initIntro(burst);
+
+  $('openInvite').addEventListener('click', e => {
+    if (!music.isPlaying()) music.toggle();
+    if (burst) burst(e.clientX, e.clientY, 18);
+    $('welcome').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+  });
+})();
