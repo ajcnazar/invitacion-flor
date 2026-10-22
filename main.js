@@ -9,6 +9,13 @@
   const rand = (min, max) => min + Math.random() * (max - min);
   const BUTTERFLY_SVG = '<svg viewBox="0 0 100 80" aria-hidden="true"><use href="#butterfly"/></svg>';
 
+  // Iconos del sprite del HTML (<symbol id="i-nombre">)
+  const icon = (name, cls = '') =>
+    `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+  const SPARK = icon('sparkle', 'i-fill');
+  const HEART = icon('heart', 'i-fill i-inline');
+  const MAIL  = icon('mail');
+
   function make(tag, className, parent) {
     const el = document.createElement(tag);
     el.className = className;
@@ -60,7 +67,7 @@
     const hero = $('hero');
     for (let i = 0; i < 16; i++) {
       const star = make('span', 'twinkle', hero);
-      star.textContent = '✦';
+      star.innerHTML = SPARK;
       star.style.left = rand(3, 95) + '%';
       star.style.top = rand(3, 95) + '%';
       star.style.fontSize = rand(.6, 1.3) + 'rem';
@@ -139,7 +146,7 @@
       for (let i = 0; i < count; i++) {
         const isButterfly = i % 3 === 0;
         const el = isButterfly ? make('span', 'mini-butterfly', fx) : make('span', 'spark', fx);
-        if (isButterfly) el.innerHTML = BUTTERFLY_SVG; else el.textContent = '✦';
+        el.innerHTML = isButterfly ? BUTTERFLY_SVG : SPARK;
 
         const angle = rand(0, Math.PI * 2);
         const dist = rand(50, isButterfly ? 150 : 110);
@@ -160,7 +167,7 @@
       if (e.pointerType !== 'mouse' || e.timeStamp - last < 70) return;
       last = e.timeStamp;
       const s = make('span', 'spark', fx);
-      s.textContent = '✦';
+      s.innerHTML = SPARK;
       s.animate([
         { transform: `translate(${e.clientX}px, ${e.clientY}px) scale(.8)`, opacity: .9 },
         { transform: `translate(${e.clientX + rand(-14, 14)}px, ${e.clientY + 28}px) scale(.2)`, opacity: 0 }
@@ -191,9 +198,9 @@
       let diff = target - Date.now();
       if (diff <= 0) {
         ['days', 'hours', 'minutes', 'seconds'].forEach(id => setValue(id, '00'));
-        $('countMessage').textContent = diff > -86400000
-          ? '¡Hoy es la gran noche de Angella! ♡'
-          : '¡Gracias por celebrar conmigo! ♡';
+        $('countMessage').innerHTML = diff > -86400000
+          ? `¡Hoy es la gran noche de Angella! ${HEART}`
+          : `¡Gracias por celebrar conmigo! ${HEART}`;
         return;
       }
       const d = Math.floor(diff / 86400000); diff %= 86400000;
@@ -238,10 +245,10 @@
     let timer = null;
 
     function drop() {
-      const e = make('span', 'envelope', rain);
-      e.textContent = '✉';
+      const e = make('span', 'rain-env', rain);
+      e.innerHTML = MAIL;
       e.style.left = rand(0, 94) + '%';
-      e.style.fontSize = rand(1, 1.9) + 'rem';
+      e.style.fontSize = rand(1.1, 2) + 'rem';
       e.style.animationDuration = rand(4, 7) + 's';
       e.style.setProperty('--sway', rand(-40, 40) + 'px');
       e.addEventListener('animationend', () => e.remove());
@@ -279,7 +286,7 @@
       const dust = $('introDust');
       for (let i = 0; i < 26; i++) {
         const star = make('span', 'twinkle', dust);
-        star.textContent = '✦';
+        star.innerHTML = SPARK;
         star.style.left = rand(2, 98) + '%';
         star.style.top = rand(2, 98) + '%';
         star.style.fontSize = rand(.6, 1.4) + 'rem';
@@ -351,8 +358,9 @@
       timer = setTimeout(loop, 1680);
     }
 
+    // Botón: nota musical al sonar, nota tachada al estar en pausa
     function setUi(on) {
-      btn.textContent = on ? '♫' : '♪';
+      btn.innerHTML = icon(on ? 'music' : 'music-off');
       btn.classList.toggle('on', on);
       btn.setAttribute('aria-label', on ? 'Pausar música' : 'Activar música');
     }
@@ -377,7 +385,7 @@
           setUi(false);
         }
       } catch (err) {
-        btn.textContent = '♪';
+        setUi(false);
       }
     }
 

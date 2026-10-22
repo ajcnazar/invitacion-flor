@@ -9,7 +9,7 @@
 </head>
 <body>
 
-  <!-- Sprite SVG: mariposa verde salvia con bordes dorados (se reutiliza con <use>) -->
+  <!-- Sprite SVG: mariposa verde salvia con bordes dorados + iconos de la invitación (se reutilizan con <use>) -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
     <defs>
       <linearGradient id="wingGreen" x1="0" y1="0" x2="1" y2="1">
@@ -30,6 +30,74 @@
         <ellipse cx="50" cy="43" rx="2.3" ry="14" fill="#8a6a2b"/>
         <path d="M49 30C46 22 42 18 38 17M51 30C54 22 58 18 62 17" fill="none" stroke="#8a6a2b" stroke-width="1.2" stroke-linecap="round"/>
       </symbol>
+
+      <!-- ===== ICONOS (24×24, trazo redondeado; el color y el relleno los define el CSS con .i / .i-fill) ===== -->
+      <symbol id="i-crown" viewBox="0 0 24 24">
+        <path d="M2.5 7.5 7.5 12 12 4.5 16.5 12 21.5 7.5 19.5 18.5H4.5Z"/>
+        <path d="M5 21.5h14"/>
+        <circle cx="2.5" cy="7.5" r="1.1" fill="currentColor"/>
+        <circle cx="12" cy="4.5" r="1.1" fill="currentColor"/>
+        <circle cx="21.5" cy="7.5" r="1.1" fill="currentColor"/>
+      </symbol>
+      <symbol id="i-heart" viewBox="0 0 24 24">
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+      </symbol>
+      <symbol id="i-sparkle" viewBox="0 0 24 24">
+        <path d="M12 1.5C12.8 7.5 16.5 11.2 22.5 12 16.5 12.8 12.8 16.5 12 22.5 11.2 16.5 7.5 12.8 1.5 12 7.5 11.2 11.2 7.5 12 1.5Z"/>
+      </symbol>
+      <symbol id="i-calendar" viewBox="0 0 24 24">
+        <rect x="3" y="4.5" width="18" height="17" rx="2.5"/>
+        <path d="M16 2.5v4M8 2.5v4M3 10h18"/>
+        <circle cx="8" cy="14.5" r=".9" fill="currentColor"/>
+        <circle cx="12" cy="14.5" r=".9" fill="currentColor"/>
+        <circle cx="16" cy="14.5" r=".9" fill="currentColor"/>
+      </symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9.5"/>
+        <path d="M12 6.5V12l3.5 2"/>
+      </symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24">
+        <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </symbol>
+      <symbol id="i-arrow-up-right" viewBox="0 0 24 24">
+        <path d="M7 7h10v10M7 17 17 7"/>
+      </symbol>
+      <symbol id="i-mail" viewBox="0 0 24 24">
+        <rect x="2" y="4.5" width="20" height="15" rx="2.5"/>
+        <path d="m22 7.5-8.97 5.2a2 2 0 0 1-2.06 0L2 7.5"/>
+      </symbol>
+      <symbol id="i-message" viewBox="0 0 24 24">
+        <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
+        <path d="M9.5 9c0 3 2.5 5.5 5.5 5.5l1-1.4-1.9-1-.9.7a3.5 3.5 0 0 1-1.5-1.5l.7-.9-1-1.9Z" stroke-width="1.2"/>
+      </symbol>
+      <symbol id="i-phone" viewBox="0 0 24 24">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92Z"/>
+      </symbol>
+      <symbol id="i-music" viewBox="0 0 24 24">
+        <path d="M9 18V5l12-2v13"/>
+        <circle cx="6" cy="18" r="3"/>
+        <circle cx="18" cy="16" r="3"/>
+      </symbol>
+      <symbol id="i-music-off" viewBox="0 0 24 24">
+        <path d="M9 18V5l12-2v13"/>
+        <circle cx="6" cy="18" r="3"/>
+        <circle cx="18" cy="16" r="3"/>
+        <path d="M3 3l18 18"/>
+      </symbol>
+      <symbol id="i-leaf" viewBox="0 0 24 24">
+        <path d="M5 19C5 10 11 4 20 4c0 9-6 15-15 15Z"/>
+        <path d="M5 19 14 10"/>
+      </symbol>
+      <!-- rama botánica decorativa (64×64) -->
+      <symbol id="i-sprig" viewBox="0 0 64 64">
+        <path d="M32 62C30 46 34 28 32 8" fill="none"/>
+        <path d="M32 6C27.5 10.5 27.5 15.5 32 20 36.5 15.5 36.5 10.5 32 6Z"/>
+        <path d="M32 50C22 50 15 43 14 34 24 34 31 40 32 50Z"/>
+        <path d="M32 41C42 41 49 34 50 25 40 25 33 31 32 41Z"/>
+        <path d="M32 31C23 31 17 25 16 17 25 17 31 22 32 31Z"/>
+        <path d="M32 24C39 24 44 19 45 13 38 13 33 17 32 24Z"/>
+      </symbol>
     </defs>
   </svg>
 
@@ -45,13 +113,13 @@
           <span>Mis</span>
           <b>XV Años</b>
           <i>Angella</i>
-          <em>♡</em>
+          <em><svg class="i i-fill" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg></em>
         </div>
         <div class="env-pocket env-left"></div>
         <div class="env-pocket env-right"></div>
         <div class="env-pocket env-bottom"></div>
         <div class="env-flap"></div>
-        <button class="seal" id="seal" aria-label="Abrir la invitación"><span>♡</span></button>
+        <button class="seal" id="seal" aria-label="Abrir la invitación"><span><svg class="i i-fill" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg></span></button>
       </div>
       <p class="intro-hint">Toca el sello para abrir</p>
     </div>
@@ -65,20 +133,20 @@
 
   <!-- Princesa caminando: baja por la pantalla mientras haces scroll -->
   <div class="princess" id="princess" aria-hidden="true">
-    <img src="princesa.png" alt="" width="460" height="752">
+    <img src="princesa.webp" alt="" width="460" height="752">
   </div>
 
   <!-- Música: pon tu archivo MP3 junto a index.html y cambia el nombre en src si hace falta.
        Si el archivo no existe, se usa la melodía sintetizada de respaldo. -->
   <audio id="bgMusic" src="Tiempo_De_Vals_Cut.mp3" loop preload="auto"></audio>
 
-  <button class="music" id="musicBtn" aria-label="Activar música" title="Activar o pausar música">♫</button>
+  <button class="music" id="musicBtn" aria-label="Activar música" title="Activar o pausar música"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-music-off"/></svg></button>
 
   <main class="page">
-    <div class="botanical b1">❦</div>
-    <div class="botanical b2">❦</div>
-    <div class="botanical b3">❦</div>
-    <div class="botanical b4">❦</div>
+    <div class="botanical b1" aria-hidden="true"><svg class="i" viewBox="0 0 64 64"><use href="#i-sprig"/></svg></div>
+    <div class="botanical b2" aria-hidden="true"><svg class="i" viewBox="0 0 64 64"><use href="#i-sprig"/></svg></div>
+    <div class="botanical b3" aria-hidden="true"><svg class="i" viewBox="0 0 64 64"><use href="#i-sprig"/></svg></div>
+    <div class="botanical b4" aria-hidden="true"><svg class="i" viewBox="0 0 64 64"><use href="#i-sprig"/></svg></div>
 
     <div class="wrap">
 
@@ -90,16 +158,16 @@
         <span class="butterfly bt4" aria-hidden="true"><svg viewBox="0 0 100 80"><use href="#butterfly"/></svg></span>
 
         <div class="kicker">Una noche de ensueño</div>
-        <div class="crown" aria-hidden="true">♕</div>
+        <div class="crown" aria-hidden="true"><svg class="i" viewBox="0 0 24 24"><use href="#i-crown"/></svg></div>
         <p class="intro">Ven y sé parte de esta historia</p>
         <div class="topline"></div>
         <h1><span>Mis</span>XV Años</h1>
         <p class="name">Angella</p>
-        <div class="ornament"><i class="heart">♡</i></div>
+        <div class="ornament"><i class="heart"><svg class="i i-fill" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg></i></div>
         <p class="subtitle">Con la bendición de Dios y mi familia, te invito a celebrar conmigo este momento tan especial.</p>
         <div class="date-ribbon">Viernes · 25 de diciembre · 2026</div>
-        <button class="open-btn" id="openInvite">Descubre la magia <span>✧</span></button>
-        <div class="hint">Toca la pantalla para llenarla de magia · Música con el botón ♫</div>
+        <button class="open-btn" id="openInvite">Descubre la magia <span><svg class="i i-fill" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sparkle"/></svg></span></button>
+        <div class="hint">Toca la pantalla para llenarla de magia · Música con el botón <svg class="i i-inline" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-music"/></svg></div>
       </section>
 
       <!-- ============ BIENVENIDA ============ -->
@@ -107,7 +175,11 @@
         <div class="kicker">Mi cuento comienza</div>
         <h2>Una noche, mil recuerdos</h2>
         <p class="copy">Hay momentos que se convierten en recuerdos para toda la vida. Hoy comienza un nuevo capítulo para mí y sería maravilloso compartirlo contigo, rodeada de amor, alegría y pequeños detalles mágicos.</p>
-        <div class="gold-rule">✧ ───── ♡ ───── ✧</div>
+        <div class="gold-rule" aria-hidden="true">
+          <svg class="i i-fill" viewBox="0 0 24 24"><use href="#i-sparkle"/></svg>
+          <svg class="i i-fill" viewBox="0 0 24 24"><use href="#i-heart"/></svg>
+          <svg class="i i-fill" viewBox="0 0 24 24"><use href="#i-sparkle"/></svg>
+        </div>
       </section>
 
       <!-- ============ CUENTA REGRESIVA ============ -->
@@ -123,7 +195,7 @@
             <div class="timebox"><strong id="minutes">--</strong><span>Minutos</span></div>
             <div class="timebox"><strong id="seconds">--</strong><span>Segundos</span></div>
           </div>
-          <p class="count-message" id="countMessage">Cada segundo nos acerca a una noche mágica ♡</p>
+          <p class="count-message" id="countMessage">Cada segundo nos acerca a una noche mágica <svg class="i i-fill i-inline" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg></p>
         </div>
       </section>
 
@@ -133,17 +205,17 @@
         <h2>Te espero para celebrar</h2>
         <div class="details">
           <div class="detail">
-            <span class="ico">♧</span><small>Fecha</small>
+            <span class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-calendar"/></svg></span><small>Fecha</small>
             <strong>Viernes</strong><strong class="number">25</strong><strong>Diciembre 2026</strong>
           </div>
           <div class="detail">
-            <span class="ico">◷</span><small>Hora</small>
+            <span class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clock"/></svg></span><small>Hora</small>
             <strong class="number">8:00</strong><strong>de la noche</strong><strong>P. M.</strong>
           </div>
           <div class="detail full">
-            <span class="ico">⌖</span><small>El lugar</small>
+            <span class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-pin"/></svg></span><small>El lugar</small>
             <strong>Carrera 7C #67B-93</strong><strong>Conjunto Ventura</strong><strong>Salón de Eventos</strong>
-            <a class="cta" href="https://www.google.com/maps/search/?api=1&query=Carrera+7C+%2367B-93%2C+Conjunto+Ventura%2C+Sal%C3%B3n+de+Eventos" target="_blank" rel="noopener">Ver ubicación en Google Maps ↗</a>
+            <a class="cta" href="https://www.google.com/maps/search/?api=1&query=Carrera+7C+%2367B-93%2C+Conjunto+Ventura%2C+Sal%C3%B3n+de+Eventos" target="_blank" rel="noopener">Ver ubicación en Google Maps <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a>
           </div>
         </div>
       </section>
@@ -153,8 +225,12 @@
         <div class="rain" id="rain" aria-hidden="true"></div>
         <div class="kicker">Un detalle especial</div>
         <h2>Mi regalo es</h2>
-        <div class="gift">Lluvia de sobres ♡</div>
-        <div class="gold-rule">✧ ───── ❦ ───── ✧</div>
+        <div class="gift">Lluvia de sobres <svg class="i i-fill i-inline" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg></div>
+        <div class="gold-rule" aria-hidden="true">
+          <svg class="i i-fill" viewBox="0 0 24 24"><use href="#i-sparkle"/></svg>
+          <svg class="i" viewBox="0 0 24 24"><use href="#i-leaf"/></svg>
+          <svg class="i i-fill" viewBox="0 0 24 24"><use href="#i-sparkle"/></svg>
+        </div>
         <p class="notice">Una pequeña petición para mi noche soñada: por favor, evita vestir de verde. ¡Quiero que las flores, las mariposas y mi vestido sean los protagonistas de ese color!</p>
       </section>
 
@@ -163,9 +239,9 @@
         <div class="kicker">Lo más importante es compartir</div>
         <h2>¿Me acompañas?</h2>
         <p class="copy">Tu presencia hará esta noche aún más especial. Confirma tu asistencia y prepárate para celebrar conmigo.</p>
-        <a class="cta cta-pulse" href="https://wa.me/573012019283?text=Hola%2C%20confirmo%20mi%20asistencia%20a%20los%20XV%20a%C3%B1os%20de%20Angella." target="_blank" rel="noopener">♡ Confirmar por WhatsApp</a>
-        <p class="notice">301 201 9283</p>
-        <div class="footer">¡No faltes, te esperamos! ♡</div>
+        <a class="cta cta-pulse" href="https://wa.me/573012019283?text=Hola%2C%20confirmo%20mi%20asistencia%20a%20los%20XV%20a%C3%B1os%20de%20Angella." target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-message"/></svg> Confirmar por WhatsApp</a>
+        <p class="notice"><svg class="i i-inline i-lead" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-phone"/></svg>301 201 9283</p>
+        <div class="footer">¡No faltes, te esperamos! <svg class="i i-fill i-inline" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg></div>
       </section>
 
     </div>
