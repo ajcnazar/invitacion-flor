@@ -178,10 +178,10 @@
   }
 
   /* =====================================================
-     6. CUENTA REGRESIVA (25 dic 2026, 8:00 p. m. Colombia, UTC-5)
+     6. CUENTA REGRESIVA (26 dic 2026, 8:00 p. m. Colombia, UTC-5)
      ===================================================== */
   function initCountdown() {
-    const target = Date.parse('2026-12-26T01:00:00Z');
+    const target = Date.parse('2026-12-27T01:00:00Z');
     const pad = n => String(n).padStart(2, '0');
 
     function setValue(id, value) {
